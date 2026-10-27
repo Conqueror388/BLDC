@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BLDC Dynamics & Sizing Solver — BLDC Motor Lab</title>
+  <meta name="description" content="Precision electromechanical motor calculator. Compute Kv, torque constant Kt, Back-EMF, shaft torque, efficiency, and copper heat dissipation with interactive torque-speed curve.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Precision Calibration Ticker Tape -->
+  <div class="instrument-ticker">
+    <div class="ticker-status">
+      <span class="ticker-dot"></span>
+      <span>DYNAMICS SOLVER & DYNAMOMETER // APPARATUS 02-C</span>
+    </div>
+    <div class="ticker-right">
+      <span>UNIT SYSTEM: SI METRIC (N·m, W, RPM)</span>
+      <span>SOLVER: DC EQUILIBRIUM</span>
+      <span>ACCURACY: ±0.1%</span>
+    </div>
+  </div>
+
+  <!-- Precision Console Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand-link">
+        <div class="brand-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <b>BLDC MOTOR LAB</b>
+          <span>INSTRUMENTATION CONSOLE</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item"><a href="index.html">Sim Console</a></li>
+          <li class="nav-item"><a href="theory.html">Theory & Commutation</a></li>
+          <li class="nav-item"><a href="calculator.html" class="active">Dynamics Solver</a></li>
+          <li class="nav-item"><a href="comparison.html">Tech Comparison</a></li>
+          <li class="nav-item"><a href="diy-lab.html">Hardware Bench</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="mobile-toggle" aria-label="Toggle navigation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+    
+    <!-- Title Block -->
+    <div style="border-bottom: 1px solid var(--border-line); padding-bottom: 2rem; margin-bottom: 2.5rem;" class="reveal-on-scroll">
+      <div class="rack-header-badge">
+        <span>ELECTROMECHANICAL EQUILIBRIUM SOLVER</span>
+      </div>
+      <h1 style="font-size: clamp(2.2rem, 4.5vw, 3.4rem); margin-bottom: 1rem; letter-spacing: -0.04em;">
+        Motor Sizing & Torque Calculator
+      </h1>
+      <p style="font-size: 1.08rem; color: var(--text-secondary); max-width: 50rem; line-height: 1.7;">
+        Model your motor's torque-speed gradient. Enter datasheet parameters or choose from standard engineering presets to solve for operational RPM, shaft torque, electrical power draw, efficiency, and copper heat dissipation.
+      </p>
+    </div>
+
+    <!-- Hardware Calibration Presets -->
+    <div style="margin-bottom: 1.5rem;" class="reveal-on-scroll">
+      <span class="label-cap" style="display: block; margin-bottom: 0.6rem;">HARDWARE CALIBRATION PRESETS</span>
+      <div class="calc-preset-bar">
+        <button type="button" class="preset-chip active" data-v="11.1" data-kv="920" data-r="0.11" data-i="12">
+          AERIAL DRONE (A2212 3S · 11.1V)
+        </button>
+        <button type="button" class="preset-chip" data-v="14.8" data-kv="2450" data-r="0.045" data-i="28">
+          FPV RACING (2207 4S · 14.8V)
+        </button>
+        <button type="button" class="preset-chip" data-v="48" data-kv="12.5" data-r="0.15" data-i="15">
+          E-SCOOTER HUB (10" · 48V)
+        </button>
+        <button type="button" class="preset-chip" data-v="7.4" data-kv="3300" data-r="0.025" data-i="35">
+          RC CAR INRUNNER (540 · 7.4V)
+        </button>
+        <button type="button" class="preset-chip" data-v="52" data-kv="9.8" data-r="0.22" data-i="20">
+          HEAVY E-BIKE DIRECT DRIVE (52V)
+        </button>
+      </div>
+    </div>
+
+    <!-- Calculator Main Layout -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;" class="reveal-on-scroll">
+      
+      <!-- Left Input Panel -->
+      <div class="instrument-panel">
+        <div class="panel-header-bar">
+          <span class="label-cap">[INPUT BUS SPECIFICATIONS]</span>
+          <span class="badge badge-info">VARIABLES</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="calc-input-group">
+            <label class="calc-input-label" for="in-v">
+              SUPPLY VOLTAGE
+              <span>[ V_BUS ]</span>
+            </label>
+            <input type="number" id="in-v" class="calc-input" step="any" min="0" value="11.1">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-input-label" for="in-kv">
+              VELOCITY CONSTANT
+              <span>[ KV ]</span>
+            </label>
+            <input type="number" id="in-kv" class="calc-input" step="any" min="0" value="920">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-input-label" for="in-r">
+              WINDING RESISTANCE
+              <span>[ R_PHASE ]</span>
+            </label>
+            <input type="number" id="in-r" class="calc-input" step="any" min="0" value="0.11">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-input-label" for="in-i">
+              OPERATING CURRENT
+              <span>[ I_LOAD ]</span>
+            </label>
+            <input type="number" id="in-i" class="calc-input" step="any" min="0" value="12">
+          </div>
+        </div>
+
+        <!-- Real-Time Hardware Alert -->
+        <div id="calc-alert" style="margin-top: 1.25rem; padding: 0.85rem; background: var(--bg-recessed); border: 1px solid var(--border-line);">
+          <!-- Injected via calculator.js -->
+        </div>
+
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-line); font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); line-height: 1.8;">
+          <div>&bull; Kt = 9.5493 / Kv = <b id="o-kt" style="color: var(--accent-amber);">0.0104 N·m/A</b></div>
+          <div>&bull; Stall Short-Circuit = V / R = <b id="o-istall" style="color: #EF4444;">100.9 A</b></div>
+          <div>&bull; Back-EMF = V_bus - (I_load &times; R_phase)</div>
+        </div>
+      </div>
+
+      <!-- Right Output Panel -->
+      <div class="instrument-panel">
+        <div class="panel-header-bar">
+          <span class="label-cap">[COMPUTED SHAFT METRICS]</span>
+          <span class="badge badge-success">LIVE OUTPUT</span>
+        </div>
+
+        <div>
+          <div class="stat-row">
+            <span class="stat-name">NO-LOAD FREE SPEED (0 N·m)</span>
+            <span class="stat-val" id="o-noload" style="color: var(--accent-amber);">10,212 RPM</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-name">LOADED OPERATING SPEED</span>
+            <span class="stat-val" id="o-speed" style="color: #ECEFF4;">8,998 RPM</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-name">SHAFT TORQUE (SI UNITS)</span>
+            <span class="stat-val" id="o-torque" style="color: var(--accent-amber);">0.125 N·m</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-name">SHAFT TORQUE (METRIC)</span>
+            <span class="stat-val" id="o-torquekg" style="color: var(--accent-amber);">1.27 kg·cm</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-name">MECHANICAL SHAFT POWER</span>
+            <span class="stat-val" id="o-pmech" style="color: #ECEFF4;">117.4 W</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-name">ELECTRICAL BUS POWER IN</span>
+            <span class="stat-val" id="o-pin" style="color: #ECEFF4;">133.2 W</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-name">ELECTROMECHANICAL EFFICIENCY</span>
+            <span class="stat-val" id="o-eff" style="color: var(--accent-emerald); font-size: 1.25rem;">88.1%</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-name">I²R COPPER THERMAL LOSS</span>
+            <span class="stat-val" id="o-heat" style="color: #EF4444;">15.8 W</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Torque-Speed Plot Stage -->
+    <div class="instrument-panel reveal-on-scroll" id="torque-curve">
+      <div class="panel-header-bar">
+        <span class="label-cap">[DYNAMOMETER CHARACTERISTIC CURVE]</span>
+        <span class="badge badge-info">LINEAR DC GRADIENT</span>
+      </div>
+
+      <div class="oscilloscope-stage" style="height: 290px; padding: 1rem;">
+        <svg id="chart-svg" viewBox="0 0 520 240" style="width: 100%; height: 100%; display: block;" role="img" aria-label="Torque speed curve"></svg>
+      </div>
+
+      <p style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.6;">
+        <b>PHYSICS PRINCIPLE:</b> DC electric motors display a strictly linear fall-off from maximum speed at zero torque down to zero RPM at short-circuit stall. The amber register marker indicates the active operating point determined by the chosen current draw.
+      </p>
+    </div>
+
+    <!-- NEW INTERACTIVE LEARNING PLATFORM: REAL-WORLD LOAD BENCH -->
+    <div class="instrument-panel reveal-on-scroll" style="margin-top: 2.5rem;">
+      <div class="panel-header-bar">
+        <div class="panel-header-title">
+          <span class="panel-indicator-dot"></span>
+          <b style="font-family: var(--font-display); font-size: 1.15rem;">INTERACTIVE REAL-WORLD LOAD BENCH</b>
+        </div>
+        <span class="badge badge-success">EQUILIBRIUM SOLVER</span>
+      </div>
+
+      <p style="font-size: 0.95rem; margin-bottom: 1.25rem;">
+        Connect real mechanical loads to your motor model. Select a load application below and adjust the parameters to see the exact steady-state operating point where <b>Motor Drive Torque = Load Resistance Torque</b>:
+      </p>
+
+      <!-- Load Mode Tabs -->
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <button type="button" class="preset-chip active" id="load-tab-prop">🚁 AERIAL DRONE PROPELLER (T ~ RPM²)</button>
+        <button type="button" class="preset-chip" id="load-tab-ev">🛴 E-SCOOTER / WHEEL DRIVE</button>
+        <button type="button" class="preset-chip" id="load-tab-winch">⚙️ ROBOTIC DIRECT-DRIVE WINCH</button>
+      </div>
+
+      <!-- Controls & Equilibrium Result Grid -->
+      <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start;">
+        
+        <!-- Controls Column -->
+        <div style="background: var(--bg-recessed); border: 1px solid var(--border-line); border-radius: var(--radius-lg); padding: 1.25rem;">
+          
+          <!-- Propeller Controls -->
+          <div id="controls-prop">
+            <div class="calc-input-group">
+              <label class="calc-input-label">PROPELLER DIAMETER: <span id="val-prop-dia">9.0 INCHES</span></label>
+              <input type="range" id="slider-prop-dia" min="5" max="15" step="0.5" value="9">
+            </div>
+            <div class="calc-input-group" style="margin-top: 1rem;">
+              <label class="calc-input-label">PROPELLER PITCH: <span id="val-prop-pitch">4.5 INCHES</span></label>
+              <input type="range" id="slider-prop-pitch" min="2" max="8" step="0.5" value="4.5">
+            </div>
+          </div>
+
+          <!-- EV Controls -->
+          <div id="controls-ev" style="display: none;">
+            <div class="calc-input-group">
+              <label class="calc-input-label">VEHICLE + RIDER MASS: <span id="val-ev-mass">75 KG</span></label>
+              <input type="range" id="slider-ev-mass" min="20" max="150" step="5" value="75">
+            </div>
+            <div class="calc-input-group" style="margin-top: 1rem;">
+              <label class="calc-input-label">ROAD INCLINE SLOPE: <span id="val-ev-slope">4% GRADE</span></label>
+              <input type="range" id="slider-ev-slope" min="0" max="20" step="1" value="4">
+            </div>
+          </div>
+
+          <!-- Winch Controls -->
+          <div id="controls-winch" style="display: none;">
+            <div class="calc-input-group">
+              <label class="calc-input-label">PAYLOAD MASS: <span id="val-winch-mass">2.5 KG</span></label>
+              <input type="range" id="slider-winch-mass" min="0.5" max="12" step="0.5" value="2.5">
+            </div>
+            <div class="calc-input-group" style="margin-top: 1rem;">
+              <label class="calc-input-label">SPOOL PULLEY RADIUS: <span id="val-winch-radius">25 MM</span></label>
+              <input type="range" id="slider-winch-radius" min="10" max="60" step="5" value="25">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Equilibrium Output Column -->
+        <div style="background: var(--bg-chassis); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem;">
+          <div class="spec-ledger-title" style="margin-bottom: 0.75rem;">
+            <span class="label-cap">EQUILIBRIUM OPERATING POINT</span>
+            <span class="badge badge-success" id="eq-status-badge">STABLE EQUILIBRIUM</span>
+          </div>
+
+          <div style="display: grid; gap: 0.75rem;">
+            <div class="stat-row">
+              <span class="stat-name">EQUILIBRIUM RPM</span>
+              <span class="stat-val" id="eq-rpm" style="color: var(--accent-amber);">7,420 RPM</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">SHAFT TORQUE DEMAND</span>
+              <span class="stat-val" id="eq-torque" style="color: #ECEFF4;">0.098 N·m</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">CURRENT DRAW (I_LOAD)</span>
+              <span class="stat-val" id="eq-current" style="color: #ECEFF4;">9.4 A</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">APPLICATION READOUT</span>
+              <span class="stat-val" id="eq-app-metric" style="color: var(--accent-emerald);">780 g Static Thrust</span>
+            </div>
+          </div>
+
+          <div id="eq-recommendation" style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-recessed); border: 1px solid var(--border-line); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary);">
+            Aerodynamic load intersects motor torque line at 72.6% of free speed. Efficiency is optimal (84.2%). Heat dissipation is within acceptable passive air-cooling limits.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-line); padding-top: 1.5rem; margin-top: 3.5rem;" class="reveal-on-scroll">
+      <a href="theory.html" class="btn btn-secondary">
+        &larr; Working Theory
+      </a>
+      <a href="comparison.html" class="btn btn-primary">
+        Explore Motor Comparison &rarr;
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Live Coordinate HUD Stamp -->
+  <div class="hud-coords-stamp">
+    <span>SYS_LOC [X:0000 Y:0000]</span>
+    <span style="color: #ECEFF4;">CALC_ACTIVE</span>
+  </div>
+  <div class="hud-crosshair"></div>
+
+  <!-- Industrial Console Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
+            <div class="brand-badge" style="width: 24px; height: 24px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </div>
+            <b style="font-family: var(--font-display); font-size: 1.05rem; color: var(--text-primary);">BLDC MOTOR LAB</b>
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem;">
+            Precision electromechanical reference platform and 3-phase BLDC vector simulator.
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <span class="badge badge-info">HTML5 SVG</span>
+            <span class="badge badge-success">ZERO DEPENDENCIES</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>DOCUMENTATION</h5>
+          <ul>
+            <li><a href="index.html">Simulation Console</a></li>
+            <li><a href="theory.html">Lorentz Electromagnetics</a></li>
+            <li><a href="theory.html#commutation">6-Step Truth Matrix</a></li>
+            <li><a href="theory.html#hall-sensors">Digital Hall Logic</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>INSTRUMENTATION</h5>
+          <ul>
+            <li><a href="calculator.html">Kv & Torque Calculator</a></li>
+            <li><a href="calculator.html#torque-curve">Torque-Speed Plot</a></li>
+            <li><a href="comparison.html">BLDC vs Brushed</a></li>
+            <li><a href="diy-lab.html">Arduino & ESC Wiring</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>SPECIFICATIONS</h5>
+          <ul>
+            <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Source Repository</a></li>
+            <li><a href="diy-lab.html#safety">Test Safety Protocols</a></li>
+            <li><a href="diy-lab.html#code">Firmware Buffers</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 BLDC MOTOR LAB. BUILT FOR GITHUB PAGES DEPLOYMENT.</div>
+        <div style="color: var(--accent-amber);">MIT LICENSE // STANDARDS: IEEE 841</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/calculator.js"></script>
+</body>
+</html>

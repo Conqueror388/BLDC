@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BLDC Motor Lab — Technical Instrumentation & Commutation Console</title>
+  <meta name="description" content="Precision electromechanical console and 3-phase BLDC vector simulator. Interactive 6-step trapezoidal commutation, Hall sensor telemetry, and motor dynamics.">
+  
+  <!-- Neat & Clean Typography: Outfit (Headings) + Plus Jakarta Sans (Body) + JetBrains Mono (Data) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Design System Stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Precision Calibration Ticker Tape -->
+  <div class="instrument-ticker">
+    <div class="ticker-status">
+      <span class="ticker-dot"></span>
+      <span>CONSOLE ONLINE // 3-PHASE VECTOR CORE // REV 2.4.0</span>
+    </div>
+    <div class="ticker-right">
+      <span>REF_FREQ: 60.00 Hz</span>
+      <span>COMMUTATION: 120° TRAPEZOIDAL</span>
+      <span>IEEE 841 COMPLIANT</span>
+    </div>
+  </div>
+
+  <!-- Precision Console Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand-link">
+        <div class="brand-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <b>BLDC MOTOR LAB</b>
+          <span>INSTRUMENTATION CONSOLE</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item"><a href="index.html" class="active">Sim Console</a></li>
+          <li class="nav-item"><a href="theory.html">Theory & Commutation</a></li>
+          <li class="nav-item"><a href="calculator.html">Dynamics Solver</a></li>
+          <li class="nav-item"><a href="comparison.html">Tech Comparison</a></li>
+          <li class="nav-item"><a href="diy-lab.html">Hardware Bench</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="mobile-toggle" aria-label="Toggle navigation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Asymmetric Instrument Rack Hero -->
+  <main>
+    <section class="hero-rack">
+      <div class="container">
+        <div class="rack-grid">
+          
+          <!-- Left Console Column -->
+          <div class="reveal-on-scroll">
+            <div class="rack-header-badge">
+              <span>TEST INSTRUMENT // APPARATUS 01-A</span>
+            </div>
+            <h1 class="rack-title">
+              Three-Phase Brushless <br>
+              <span class="accent-stamp">Electromagnetic Commutation</span>
+            </h1>
+            <p class="rack-desc">
+              Solid-state electronic commutation replacing mechanical carbon brushes. Observe magnetic flux vectors continuously pull the permanent-magnet rotor across six 60° electrical sectors, synchronized by 3-bit Hall sensor feedback.
+            </p>
+            <div class="rack-quick-bar">
+              <a href="#workbench" class="btn btn-primary">
+                <span>Engage Live Bench</span>
+                <span class="mono">&darr;</span>
+              </a>
+              <a href="theory.html" class="btn btn-secondary">
+                <span>View 6-Step Truth Table</span>
+                <span class="mono">&rarr;</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Instrument Spec Ledger -->
+          <div class="rack-spec-ledger reveal-on-scroll">
+            <div class="spec-ledger-title">
+              <span class="label-cap">CHASSIS SPECIFICATIONS</span>
+              <span class="badge badge-info">NOMINAL</span>
+            </div>
+            <div class="spec-ledger-list">
+              <div class="spec-item">
+                <span class="spec-key">ROTOR TOPOLOGY:</span>
+                <span class="spec-val">2-Pole NdFeB Permanent Magnet</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-key">STATOR WINDING:</span>
+                <span class="spec-val">6-Slot Wye (3-Phase Balanced)</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-key">SWITCHING SECTOR:</span>
+                <span class="spec-val">60° Electrical (6-Step Trapeze)</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-key">CONDUCTION ANGLE:</span>
+                <span class="spec-val">120° Active · 60° Floating</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-key">SENSOR INTERFACE:</span>
+                <span class="spec-val">120° Digital Hall Array</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Workbench Interactive Console Section -->
+    <section id="workbench" class="container" style="padding-top: 2.5rem; padding-bottom: 3rem;">
+      <div class="workbench-layout">
+        
+        <!-- Left Stage: 3D Motor & 2D Vector Cross-Section -->
+        <div class="instrument-panel reveal-on-scroll">
+          <div class="panel-header-bar">
+            <div class="panel-header-title">
+              <span class="panel-indicator-dot"></span>
+              <b style="font-family: var(--font-display); font-size: 1.05rem;">ELECTROMAGNETIC MOTOR STAGE</b>
+            </div>
+            <span class="label-cap">3D WEBGL & 2D SCHEMATIC</span>
+          </div>
+
+          <!-- View Switcher -->
+          <div class="motor-stage-switch">
+            <div class="stage-tab-group">
+              <button type="button" class="stage-tab-btn active" id="tab-view-3d">3D MOTOR BENCH</button>
+              <button type="button" class="stage-tab-btn" id="tab-view-2d">2D VECTOR CROSS-SECTION</button>
+            </div>
+            <span class="badge badge-success" style="font-size: 0.68rem;">60 FPS HARDWARE ACCEL</span>
+          </div>
+
+          <!-- 3D Stage View -->
+          <div id="stage-view-3d">
+            <div class="canvas-3d-container" id="canvas-3d-wrap">
+              <div class="canvas-3d-part-badge" id="part-inspector-badge">10 LAYERS · 38 INDIVIDUAL PARTS</div>
+              <div class="canvas-3d-overlay">[ DRAG TO ORBIT 360° · SCROLL TO ZOOM ]</div>
+              <div class="canvas-3d-controls">
+                <div class="canvas-3d-ctrl-group">
+                  <button type="button" class="btn btn-sm btn-secondary" id="btn-3d-explode" style="padding: 0.35rem 0.85rem; font-size: 0.75rem;">[ EXPLODED VIEW ]</button>
+                  <div class="explode-slider-wrap">
+                    <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted);">EXPLODE:</span>
+                    <input type="range" id="explode-slider" min="0" max="100" value="0" aria-label="Explosion distance percentage">
+                    <span class="mono" id="explode-val" style="color: var(--accent-amber); font-size: 0.72rem; min-width: 28px;">0%</span>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-secondary" id="btn-3d-reset" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">RESET CAM</button>
+                </div>
+                <span class="mono" id="exploded-part-tag" style="font-size: 0.72rem; color: var(--accent-amber);">HOVER A PART TO INSPECT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2D Vector Schematic View -->
+          <div id="stage-view-2d" style="display: none;">
+            <div class="motor-chassis-stage">
+              <div style="position: absolute; top: 0.85rem; left: 1rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-amber);">
+                [CHASSIS: 2D VECTOR FLUX DISPLAY]
+              </div>
+
+              <svg id="motor-svg" viewBox="0 0 420 420" role="img" aria-label="Animated cross-section of a 3-Phase BLDC motor"></svg>
+
+              <!-- Technical Legend -->
+              <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                <span style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="width: 10px; height: 10px; background: var(--phase-a); border-radius: 50%;"></span> PHASE A
+                </span>
+                <span style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="width: 10px; height: 10px; background: var(--phase-b); border-radius: 50%;"></span> PHASE B
+                </span>
+                <span style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="width: 10px; height: 10px; background: var(--phase-c); border-radius: 50%;"></span> PHASE C
+                </span>
+                <span style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="width: 10px; height: 10px; background: var(--accent-emerald); border-radius: 50%;"></span> HALL HIGH (1)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Stage: Controller Telemetry & Tactile Controls -->
+        <div class="instrument-panel reveal-on-scroll" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="panel-header-bar">
+              <div class="panel-header-title">
+                <b style="font-family: var(--font-display); font-size: 1.05rem;">MICROCONTROLLER TELEMETRY</b>
+              </div>
+              <span class="badge badge-info">120° CONDUCTION</span>
+            </div>
+
+            <!-- Numeric Telemetry Block -->
+            <div class="telemetry-row">
+              <div class="telemetry-cell">
+                <span class="telemetry-label">COMMUTATION</span>
+                <div class="telemetry-number" id="r-step" style="color: var(--accent-amber);">1 / 6</div>
+              </div>
+              <div class="telemetry-cell">
+                <span class="telemetry-label">HALL CODE</span>
+                <div class="telemetry-number" id="r-hall" style="color: var(--accent-emerald);">101</div>
+              </div>
+              <div class="telemetry-cell">
+                <span class="telemetry-label">CURRENT LOOP</span>
+                <div class="telemetry-number" id="r-path" style="font-size: 1.15rem; color: #ECEFF4;">A &rarr; B</div>
+              </div>
+            </div>
+
+            <!-- Phase State Matrix -->
+            <div class="phase-matrix-rack">
+              <div class="phase-pill" id="phase-pill-a">A: <b>HIGH (+V)</b></div>
+              <div class="phase-pill" id="phase-pill-b">B: <b>LOW (GND)</b></div>
+              <div class="phase-pill" id="phase-pill-c">C: <i>FLOAT (Z)</i></div>
+            </div>
+
+            <!-- Throttle Slider Control -->
+            <div class="slider-assembly">
+              <div class="slider-meta-bar">
+                <span class="label-cap">PWM THROTTLE DUTY CYCLE</span>
+                <span class="mono" id="throttle-val" style="color: var(--accent-amber); font-weight: 700;">40%</span>
+              </div>
+              <input type="range" id="throttle-slider" min="0" max="100" value="40" aria-label="Throttle percentage">
+              <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">
+                <span>0% IDLE</span>
+                <span>CALCULATED: <b id="r-rpm" style="color: #ECEFF4;">720</b> RPM · THETA: <b id="r-angle" style="color: #ECEFF4;">20°</b></span>
+                <span>100% WOT</span>
+              </div>
+            </div>
+
+            <!-- Tactical Rocker Buttons -->
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+              <button class="btn btn-primary btn-sm" id="btn-play" type="button">[ PAUSE ]</button>
+              <button class="btn btn-secondary btn-sm" id="btn-step-fwd" type="button">+60° STEP</button>
+              <button class="btn btn-secondary btn-sm" id="btn-step-rev" type="button">-60° STEP</button>
+              <button class="btn btn-secondary btn-sm" id="btn-dir" type="button">DIR: CW</button>
+            </div>
+          </div>
+
+          <!-- Oscilloscope Strip -->
+          <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span class="label-cap">COMMUTATION OSCILLOSCOPE TRACE</span>
+              <span class="label-cap">120° WINDOW</span>
+            </div>
+            <div class="oscilloscope-stage">
+              <svg id="strip-svg" viewBox="0 0 360 130" role="img" aria-label="Six-step commutation diagram"></svg>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Asymmetric Exploration Ledger (NO Generic 3-Card Grid!) -->
+      <div class="exploration-ledger reveal-on-scroll">
+        <div style="margin-bottom: 1.5rem;">
+          <span class="label-cap">INSTRUMENTATION DOSSIER & MODULES</span>
+          <h2 style="font-size: 1.7rem; margin-top: 0.35rem;">Technical Reference Modules</h2>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-line);">
+          
+          <a href="theory.html" class="ledger-row">
+            <span class="ledger-tag">[01 // PHYSICS]</span>
+            <div class="ledger-body">
+              <h3>Electromagnetics & 6-Step Commutation Truth Table</h3>
+              <p>Lorentz force derivation, 3-phase 120° conduction sequences, Hall sensor decoding logic, and Back-EMF zero-crossing detection.</p>
+            </div>
+            <div class="ledger-action">OPEN THEORY &rarr;</div>
+          </a>
+
+          <a href="calculator.html" class="ledger-row">
+            <span class="ledger-tag">[02 // DYNAMICS]</span>
+            <div class="ledger-body">
+              <h3>Motor Sizing Solver & Interactive Torque-Speed Plot</h3>
+              <p>Solve velocity constant (Kv), torque constant (Kt), Back-EMF, shaft output, efficiency curves, and copper I²R thermal dissipation.</p>
+            </div>
+            <div class="ledger-action">SOLVE MOTOR &rarr;</div>
+          </a>
+
+          <a href="comparison.html" class="ledger-row">
+            <span class="ledger-tag">[03 // BENCHMARK]</span>
+            <div class="ledger-body">
+              <h3>Motor Architecture Matrix & Selection Advisor</h3>
+              <p>Technical tradeoff matrix benchmark comparing BLDC, Brushed DC, Stepper motors, and PMSM across efficiency, lifespan, and cost.</p>
+            </div>
+            <div class="ledger-action">COMPARE TECH &rarr;</div>
+          </a>
+
+          <a href="diy-lab.html" class="ledger-row">
+            <span class="ledger-tag">[04 // HARDWARE]</span>
+            <div class="ledger-body">
+              <h3>Benchtop Arduino & ESP32 ESC Controller Guide</h3>
+              <p>Wiring schematics connecting microcontrollers to electronic speed controllers, arming sequences, and firmware code snippets.</p>
+            </div>
+            <div class="ledger-action">BUILD HARDWARE &rarr;</div>
+          </a>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Live Coordinate HUD Stamp (Signature Interaction) -->
+  <div class="hud-coords-stamp">
+    <span>SYS_LOC [X:0000 Y:0000]</span>
+    <span style="color: #ECEFF4;">CAL: 60.00Hz</span>
+  </div>
+
+  <!-- HUD Crosshair Element -->
+  <div class="hud-crosshair"></div>
+
+  <!-- Industrial Console Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
+            <div class="brand-badge" style="width: 24px; height: 24px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </div>
+            <b style="font-family: var(--font-display); font-size: 1.05rem; color: var(--text-primary);">BLDC MOTOR LAB</b>
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem;">
+            Precision electromechanical reference platform and 3-phase BLDC vector simulator. Engineered for robotics, aeromodeling, and electric mobility.
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <span class="badge badge-info">HTML5 SVG</span>
+            <span class="badge badge-success">ZERO DEPENDENCIES</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>DOCUMENTATION</h5>
+          <ul>
+            <li><a href="index.html">Simulation Console</a></li>
+            <li><a href="theory.html">Lorentz Electromagnetics</a></li>
+            <li><a href="theory.html#commutation">6-Step Truth Matrix</a></li>
+            <li><a href="theory.html#hall-sensors">Digital Hall Logic</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>INSTRUMENTATION</h5>
+          <ul>
+            <li><a href="calculator.html">Kv & Torque Calculator</a></li>
+            <li><a href="calculator.html#torque-curve">Torque-Speed Plot</a></li>
+            <li><a href="comparison.html">BLDC vs Brushed</a></li>
+            <li><a href="diy-lab.html">Arduino & ESC Wiring</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>SPECIFICATIONS</h5>
+          <ul>
+            <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Source Repository</a></li>
+            <li><a href="diy-lab.html#safety">Test Safety Protocols</a></li>
+            <li><a href="diy-lab.html#code">Firmware Buffers</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 BLDC MOTOR LAB. BUILT FOR GITHUB PAGES DEPLOYMENT.</div>
+        <div style="color: var(--accent-amber);">MIT LICENSE // STANDARDS: IEEE 841</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/motor-sim.js"></script>
+  <script src="assets/js/motor-3d.js"></script>
+</body>
+</html>

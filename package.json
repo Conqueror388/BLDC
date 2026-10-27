@@ -1,0 +1,26 @@
+{
+  "name": "bldc-motor-lab",
+  "version": "1.0.0",
+  "description": "Interactive 3-Phase Brushless DC Motor Lab & Simulation Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve . -l 3000",
+    "dev": "serve . -l 3000",
+    "serve": "serve . -l 3000"
+  },
+  "keywords": [
+    "bldc",
+    "motor",
+    "simulation",
+    "interactive",
+    "physics",
+    "electronics",
+    "arduino"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer-core": "^25.16.0",
+    "serve": "^14.2.4"
+  }
+}

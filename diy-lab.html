@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIY BLDC Motor Controller Lab — Hardware & Firmware Bench</title>
+  <meta name="description" content="Benchtop hardware assembly guide for BLDC motor speed control with Arduino Uno and ESP32. Wiring schematics, ESC arming sequences, and firmware code.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Precision Calibration Ticker Tape -->
+  <div class="instrument-ticker">
+    <div class="ticker-status">
+      <span class="ticker-dot"></span>
+      <span>HARDWARE BENCH & FIRMWARE LOADER // APPARATUS 04-E</span>
+    </div>
+    <div class="ticker-right">
+      <span>LOGIC: 5V TTL / 3.3V CMOS</span>
+      <span>PULSE SPEC: 1000μs – 2000μs @ 50Hz</span>
+      <span>BENCH SAFETY: ACTIVE</span>
+    </div>
+  </div>
+
+  <!-- Precision Console Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand-link">
+        <div class="brand-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <b>BLDC MOTOR LAB</b>
+          <span>INSTRUMENTATION CONSOLE</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item"><a href="index.html">Sim Console</a></li>
+          <li class="nav-item"><a href="theory.html">Theory & Commutation</a></li>
+          <li class="nav-item"><a href="calculator.html">Dynamics Solver</a></li>
+          <li class="nav-item"><a href="comparison.html">Tech Comparison</a></li>
+          <li class="nav-item"><a href="diy-lab.html" class="active">Hardware Bench</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="mobile-toggle" aria-label="Toggle navigation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+    
+    <!-- Title Block -->
+    <div style="border-bottom: 1px solid var(--border-line); padding-bottom: 2rem; margin-bottom: 3rem;" class="reveal-on-scroll">
+      <div class="rack-header-badge">
+        <span>BENCHTOP HARDWARE & FIRMWARE DEPLOYMENT</span>
+      </div>
+      <h1 style="font-size: clamp(2.2rem, 4.5vw, 3.4rem); margin-bottom: 1rem; letter-spacing: -0.04em;">
+        Spin a BLDC Motor with Arduino & ESC
+      </h1>
+      <p style="font-size: 1.08rem; color: var(--text-secondary); max-width: 50rem; line-height: 1.7;">
+        An Electronic Speed Controller (ESC) encapsulates the 3-phase MOSFET bridge and sensorless commutation processor. By transmitting standard servo pulses (1000&mu;s to 2000&mu;s at 50Hz), a microcontroller commands throttle velocity with precision.
+      </p>
+    </div>
+
+    <!-- Bill of Materials Ledger -->
+    <div style="margin-bottom: 3.5rem;" class="reveal-on-scroll">
+      <span class="label-cap" style="display: block; margin-bottom: 0.85rem;">BILL OF MATERIALS (BOM)</span>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+        
+        <div class="instrument-panel">
+          <div class="panel-header-bar">
+            <span class="label-cap">[ACTUATOR]</span>
+            <span class="badge badge-info">1000KV</span>
+          </div>
+          <h4 style="margin-bottom: 0.4rem; color: #ECEFF4;">Outrunner Motor</h4>
+          <p style="font-size: 0.82rem; font-family: var(--font-mono); color: var(--text-muted); line-height: 1.6;">
+            A2212 or 2207 brushless outrunner. Robust 3.17mm shaft.
+          </p>
+        </div>
+
+        <div class="instrument-panel">
+          <div class="panel-header-bar">
+            <span class="label-cap">[INVERTER]</span>
+            <span class="badge badge-info">30A 3S</span>
+          </div>
+          <h4 style="margin-bottom: 0.4rem; color: #ECEFF4;">Brushless ESC</h4>
+          <p style="font-size: 0.82rem; font-family: var(--font-mono); color: var(--text-muted); line-height: 1.6;">
+            30A continuous rating with 5V 2A BEC and 3 bullet phase leads.
+          </p>
+        </div>
+
+        <div class="instrument-panel">
+          <div class="panel-header-bar">
+            <span class="label-cap">[CONTROLLER]</span>
+            <span class="badge badge-info">MCU</span>
+          </div>
+          <h4 style="margin-bottom: 0.4rem; color: #ECEFF4;">Arduino / ESP32</h4>
+          <p style="font-size: 0.82rem; font-family: var(--font-mono); color: var(--text-muted); line-height: 1.6;">
+            Arduino Uno, Nano, or ESP32 development board with hardware PWM.
+          </p>
+        </div>
+
+        <div class="instrument-panel">
+          <div class="panel-header-bar">
+            <span class="label-cap">[THROTTLE]</span>
+            <span class="badge badge-info">ANALOG</span>
+          </div>
+          <h4 style="margin-bottom: 0.4rem; color: #ECEFF4;">10kΩ Potentiometer</h4>
+          <p style="font-size: 0.82rem; font-family: var(--font-mono); color: var(--text-muted); line-height: 1.6;">
+            Linear taper potentiometer + 12V 10A DC lab power supply or 3S LiPo.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Wiring Schematic Workbench -->
+    <div class="instrument-panel reveal-on-scroll" style="margin-bottom: 3.5rem;">
+      <div class="panel-header-bar">
+        <span class="label-cap">[ELECTROMECHANICAL INTERCONNECTION SCHEMATIC]</span>
+        <span class="badge badge-info">PINOUT GUIDE</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: center;">
+        
+        <!-- Technical Vector Wiring Diagram -->
+        <div class="oscilloscope-stage" style="padding: 1.5rem; text-align: center;">
+          <svg viewBox="0 0 440 260" style="width: 100%; height: auto; max-width: 440px;" role="img" aria-label="Wiring schematic between Arduino, ESC and BLDC motor">
+            <!-- Arduino Chassis -->
+            <rect x="20" y="30" width="100" height="180" fill="#12161F" stroke="#2E384A" stroke-width="1.5"/>
+            <text x="70" y="52" fill="#ECEFF4" font-size="11" font-weight="700" font-family="var(--font-mono)" text-anchor="middle">ARDUINO</text>
+            <text x="32" y="90" fill="#8E9BAE" font-size="9" font-family="var(--font-mono)">PIN 9 (PWM)</text>
+            <rect x="115" y="83" width="8" height="8" fill="#FF8800"/>
+            <text x="32" y="130" fill="#8E9BAE" font-size="9" font-family="var(--font-mono)">GND (REF)</text>
+            <rect x="115" y="123" width="8" height="8" fill="#536074"/>
+            <text x="32" y="170" fill="#8E9BAE" font-size="9" font-family="var(--font-mono)">A0 (POT)</text>
+            <rect x="115" y="163" width="8" height="8" fill="#00D2A0"/>
+
+            <!-- ESC Chassis -->
+            <rect x="200" y="50" width="110" height="140" fill="#0E1218" stroke="#FF8800" stroke-width="1.5"/>
+            <text x="255" y="75" fill="#FF8800" font-size="11" font-weight="700" font-family="var(--font-mono)" text-anchor="middle">30A ESC</text>
+            <text x="210" y="105" fill="#8E9BAE" font-size="9" font-family="var(--font-mono)">SIG (WHITE)</text>
+            <rect x="198" y="98" width="8" height="8" fill="#FF8800"/>
+            <text x="210" y="135" fill="#8E9BAE" font-size="9" font-family="var(--font-mono)">GND (BLACK)</text>
+            <rect x="198" y="128" width="8" height="8" fill="#536074"/>
+            <text x="255" y="170" fill="#EF4444" font-size="9" font-family="var(--font-mono)" text-anchor="middle">BATT +/- (12V)</text>
+
+            <!-- Motor Block -->
+            <circle cx="380" cy="120" r="38" fill="#12161F" stroke="#2E384A" stroke-width="2"/>
+            <circle cx="380" cy="120" r="8" fill="#0A0D12" stroke="#FF8800" stroke-width="2"/>
+            <text x="380" y="118" fill="#ECEFF4" font-size="10" font-weight="700" font-family="var(--font-mono)" text-anchor="middle">BLDC</text>
+            <text x="380" y="132" fill="#FF8800" font-size="8" font-family="var(--font-mono)" text-anchor="middle">MOTOR</text>
+
+            <!-- Connecting Signal Traces -->
+            <path d="M 123 87 C 150 87, 160 102, 198 102" fill="none" stroke="#FF8800" stroke-width="1.5"/>
+            <path d="M 123 127 C 150 127, 160 132, 198 132" fill="none" stroke="#536074" stroke-width="1.5"/>
+
+            <!-- Phase Traces -->
+            <path d="M 310 95 L 348 102" fill="none" stroke="#E05315" stroke-width="2"/>
+            <path d="M 310 120 L 342 120" fill="none" stroke="#00C9A7" stroke-width="2"/>
+            <path d="M 310 145 L 348 138" fill="none" stroke="#3D84FF" stroke-width="2"/>
+          </svg>
+        </div>
+
+        <!-- Wire Guide Checklist -->
+        <div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: #ECEFF4;">Electrical Hookup Rules</h3>
+          <ol style="padding-left: 1.25rem; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.8; color: var(--text-secondary);">
+            <li><b style="color: #ECEFF4;">PWM SIGNAL (WHITE/ORANGE):</b> Tie to Arduino digital Pin 9 (timer hardware PWM output).</li>
+            <li><b style="color: #ECEFF4;">COMMON REFERENCE GND:</b> Tie ESC signal GND (black wire) directly to Arduino GND plane. Floating ground causes severe jitter.</li>
+            <li><b style="color: #EF4444;">RED 5V BEC LEAD:</b> <span style="color: #EF4444;">DISCONNECT / TAPE OFF</span> if Arduino is powered over USB to prevent dual-regulator bus contention.</li>
+            <li><b style="color: #ECEFF4;">MOTOR PHASE REVERSAL:</b> Swapping any two of the three motor phase leads immediately inverts rotation direction (CW &harr; CCW).</li>
+            <li><b style="color: #ECEFF4;">ANALOG POTENTIOMETER:</b> Connect wiper to Analog Pin A0; outer legs to 5V and GND rails.</li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- NEW INTERACTIVE LEARNING PLATFORM: VIRTUAL ARDUINO & ESC HARDWARE BENCH -->
+    <div class="instrument-panel reveal-on-scroll" style="margin-bottom: 3.5rem;">
+      <div class="panel-header-bar">
+        <div class="panel-header-title">
+          <span class="panel-indicator-dot"></span>
+          <b style="font-family: var(--font-display); font-size: 1.15rem;">VIRTUAL ARDUINO & ESC HARDWARE BENCH</b>
+        </div>
+        <span class="badge badge-success">50HZ HARDWARE PWM</span>
+      </div>
+
+      <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem;">
+        Test and calibrate a simulated electronic speed controller. Arm the ESC to clear the safety lockout, rotate the virtual potentiometer wiper, and observe the live 50Hz PWM pulse width on the real-time oscilloscope:
+      </p>
+
+      <!-- Action Controls -->
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-arm-esc">[ POWER ON & ARM ESC ]</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-audio">🔇 AUDIO: MUTED</button>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #EF4444; display: inline-block;" id="esc-led"></span>
+          <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">ESC STATUS LED</span>
+        </div>
+      </div>
+
+      <!-- Simulator 2-Column Grid -->
+      <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 1.5rem; align-items: start; margin-bottom: 1.5rem;">
+        
+        <!-- Left: Potentiometer + Oscilloscope -->
+        <div style="background: var(--bg-recessed); border: 1px solid var(--border-line); border-radius: var(--radius-lg); padding: 1.25rem;">
+          
+          <!-- Potentiometer Slider -->
+          <div class="slider-assembly" style="margin-bottom: 1.25rem;">
+            <div class="slider-meta-bar">
+              <span class="calc-input-label" style="margin: 0;">10kΩ THROTTLE POTENTIOMETER (PIN A0)</span>
+              <span class="mono" id="val-pot-pw" style="color: var(--accent-amber); font-weight: 700;">1000 μs</span>
+            </div>
+            <input type="range" id="pot-slider" min="1000" max="2000" step="5" value="1000">
+            <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); margin-top: 0.4rem;">
+              <span>1000μs (0% IDLE)</span>
+              <span>1500μs (50% MID)</span>
+              <span>2000μs (100% WOT)</span>
+            </div>
+          </div>
+
+          <!-- Live Oscilloscope Screen -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span class="label-cap">REAL-TIME OSCILLOSCOPE (PIN 9 CH-1)</span>
+              <span class="mono" style="font-size: 0.72rem; color: #00D2A0;">DUTY: <b id="val-duty-pct">5.0%</b></span>
+            </div>
+            <div style="background: #06080C; border: 1px solid var(--border-strong); border-radius: var(--radius-md); overflow: hidden;">
+              <canvas id="scope-canvas" width="480" height="150" style="display: block; width: 100%; height: auto;"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Motor Spinner & Live Serial Monitor -->
+        <div style="background: var(--bg-chassis); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem;">
+          
+          <!-- Motor & Telemetry Card -->
+          <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-line);">
+            
+            <!-- Motor SVG Visual Spinner -->
+            <svg width="80" height="80" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="#0A0D12" stroke="#2E384A" stroke-width="2"/>
+              <g id="prop-spinner">
+                <!-- 2-blade Propeller -->
+                <path d="M 60 20 C 52 35, 52 50, 60 60 C 68 50, 68 35, 60 20 Z" fill="#FF7700" opacity="0.85"/>
+                <path d="M 60 100 C 52 85, 52 70, 60 60 C 68 70, 68 85, 60 100 Z" fill="#FF7700" opacity="0.85"/>
+              </g>
+              <circle cx="60" cy="60" r="14" fill="#161A24" stroke="#8B95A5" stroke-width="1.5"/>
+              <circle cx="60" cy="60" r="4" fill="#FF7700"/>
+            </svg>
+
+            <!-- Dynamic Telemetry Readout -->
+            <div style="flex: 1;">
+              <div class="stat-name" style="font-size: 0.75rem;">SHAFT VELOCITY</div>
+              <div class="mono" id="val-bench-rpm" style="font-size: 1.35rem; font-weight: 700; color: var(--accent-amber);">0 RPM</div>
+              <div style="display: flex; gap: 0.75rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">
+                <span>THROTTLE: <b id="val-pot-pct" style="color: #ECEFF4;">0%</b></span>
+                <span>ADC RAW: <b id="val-pot-adc" style="color: #ECEFF4;">0</b></span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Virtual Serial Monitor Screen -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span class="label-cap">SERIAL MONITOR (115200 BAUD)</span>
+              <span class="badge badge-success" style="font-size: 0.65rem;">CONNECTED</span>
+            </div>
+            <div class="serial-monitor-screen" id="serial-screen">
+              <div class="serial-line sys">[SYSTEM BOOT] Arduino Uno ATmega328P initialized.</div>
+              <div class="serial-line sys">[TIMER1 CONFIG] 16-bit Hardware Timer mapped to Pin 9.</div>
+              <div class="serial-line">[READY] Press [POWER ON & ARM ESC] to start pulse generation.</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Firmware Code Console -->
+    <div class="instrument-panel reveal-on-scroll" id="code" style="margin-bottom: 3.5rem;">
+      <div class="panel-header-bar">
+        <span class="label-cap">[FIRMWARE BUFFER & PWM TIMER CONFIGURATION]</span>
+        <button class="btn btn-secondary btn-sm copy-btn" data-target="active-code" type="button">
+          [ COPY BUFFER ]
+        </button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+        <button type="button" class="preset-chip active" id="tab-arduino" onclick="switchCodeTab('arduino')">ARDUINO C++ (SERVO.H)</button>
+        <button type="button" class="preset-chip" id="tab-esp32" onclick="switchCodeTab('esp32')">ESP32 (LEDC HARDWARE PWM)</button>
+      </div>
+
+      <!-- Arduino Code Box -->
+      <div class="code-container" id="code-arduino-wrap">
+        <div class="code-header">
+          <span>BLDC_Throttle_Control.ino (50Hz RC PWM)</span>
+          <span class="badge badge-info">1000μs – 2000μs BOUNDS</span>
+        </div>
+<pre id="active-code">#include &lt;Servo.h&gt;
+
+Servo esc;
+
+const int ESC_PIN = 9;   // Hardware PWM pin attached to ESC signal
+const int POT_PIN = A0;  // 10k potentiometer center wiper on Analog 0
+
+void setup() {
+  Serial.begin(115200);
+  
+  // Attach ESC on Pin 9 with 1000us - 2000us standard bounds
+  esc.attach(ESC_PIN, 1000, 2000);
+  
+  // MANDATORY ARMING SEQUENCE:
+  // Write 1000us (idle throttle) to clear ESC boot lockout
+  esc.writeMicroseconds(1000);
+  Serial.println("[ARMING] Transmitting 1000us idle pulse...");
+  delay(3500); // Wait for confirmation readiness beeps
+  Serial.println("[SYSTEM READY] ESC armed. Slowly advance throttle potentiometer.");
+}
+
+void loop() {
+  int rawValue = analogRead(POT_PIN); // 0 to 1023
+  int pulseWidth = map(rawValue, 0, 1023, 1000, 2000);
+  
+  esc.writeMicroseconds(pulseWidth);
+  delay(20); // 50 Hz frame refresh rate
+}</pre>
+      </div>
+
+      <!-- ESP32 Code Box -->
+      <div class="code-container" id="code-esp32-wrap" style="display: none;">
+        <div class="code-header">
+          <span>ESP32_LEDC_PWM.ino (Hardware Timer PWM)</span>
+          <span class="badge badge-success">3.3V CMOS TOLERANT</span>
+        </div>
+<pre id="code-esp32">#define ESC_PIN 18
+#define POT_PIN 34
+
+const int PWM_FREQ = 50;        // 50Hz RC frame
+const int PWM_RESOLUTION = 16;  // 16-bit timer (65536 counts)
+const int PWM_CHANNEL = 0;
+
+void setup() {
+  Serial.begin(115200);
+  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttachPin(ESC_PIN, PWM_CHANNEL);
+
+  // 1ms pulse out of 20ms = 5% duty cycle = 3276 counts
+  ledcWrite(PWM_CHANNEL, 3276);
+  Serial.println("[ARMING] Transmitting idle frame on ESP32...");
+  delay(3500);
+}
+
+void loop() {
+  int pot = analogRead(POT_PIN); // 0 to 4095
+  int duty = map(pot, 0, 4095, 3276, 6553); // 1ms to 2ms
+  ledcWrite(PWM_CHANNEL, duty);
+  delay(20);
+}</pre>
+      </div>
+    </div>
+
+    <!-- Arming Checklist -->
+    <div class="instrument-panel reveal-on-scroll" style="margin-bottom: 3.5rem;">
+      <div class="panel-header-bar">
+        <span class="label-cap">[PRE-IGNITION HARDWARE CHECKLIST]</span>
+        <span class="badge badge-info">CALIBRATION</span>
+      </div>
+
+      <div style="display: grid; gap: 0.85rem; font-family: var(--font-mono); font-size: 0.82rem;">
+        <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; color: var(--text-primary);">
+          <input type="checkbox" checked style="accent-color: var(--accent-amber); width: 16px; height: 16px;">
+          <div>
+            <b>01. COMMON REFERENCE GROUND VERIFIED:</b>
+            <p style="color: var(--text-muted); margin-top: 0.2rem;">Arduino GND physically connected to ESC signal ground wire.</p>
+          </div>
+        </label>
+
+        <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; color: var(--text-primary);">
+          <input type="checkbox" checked style="accent-color: var(--accent-amber); width: 16px; height: 16px;">
+          <div>
+            <b>02. ZERO-THROTTLE ARMING PULSE VERIFIED:</b>
+            <p style="color: var(--text-muted); margin-top: 0.2rem;">Boot routine writes 1000&mu;s minimum throttle for 3.5 seconds prior to loop entry.</p>
+          </div>
+        </label>
+
+        <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; color: var(--text-primary);">
+          <input type="checkbox" style="accent-color: var(--accent-amber); width: 16px; height: 16px;">
+          <div>
+            <b>03. CELL COUNT BEEP CONFIRMATION:</b>
+            <p style="color: var(--text-muted); margin-top: 0.2rem;">Audible confirmation from motor windings (3 rising beeps = 3S LiPo detected; 1 final long confirmation beep).</p>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Safety Protocol Banner -->
+    <div class="safety-card reveal-on-scroll" id="safety">
+      <h4>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        BENCHTOP TEST SAFETY PROTOCOLS
+      </h4>
+      <p style="color: #FECACA; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7; margin-bottom: 0.5rem;">
+        <b>1. NEVER ATTACH PROPELLERS TO MOTORS ON THE BENCH.</b> Bare-shaft testing only. Blades spinning at 20,000 RPM act as lethal laceration hazards.
+      </p>
+      <p style="color: #FECACA; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7; margin-bottom: 0.5rem;">
+        <b>2. MECHANICAL REACTION TORQUE CLAMP:</b> Clamp motor housing securely to the bench. Unmounted motors will violently flip when throttle steps are applied.
+      </p>
+      <p style="color: #FECACA; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7;">
+        <b>3. CURRENT-LIMITED BENCH SUPPLY:</b> Utilize an inline automotive fuse or smoke stopper current limiter during first power-up.
+      </p>
+    </div>
+
+    <!-- Navigation -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-line); padding-top: 1.5rem; margin-top: 3.5rem;" class="reveal-on-scroll">
+      <a href="comparison.html" class="btn btn-secondary">
+        &larr; Tech Comparison
+      </a>
+      <a href="index.html" class="btn btn-primary">
+        Return to Simulation Console &rarr;
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Live Coordinate HUD Stamp -->
+  <div class="hud-coords-stamp">
+    <span>SYS_LOC [X:0000 Y:0000]</span>
+    <span style="color: #ECEFF4;">BENCH_ACTIVE</span>
+  </div>
+  <div class="hud-crosshair"></div>
+
+  <!-- Industrial Console Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
+            <div class="brand-badge" style="width: 24px; height: 24px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </div>
+            <b style="font-family: var(--font-display); font-size: 1.05rem; color: var(--text-primary);">BLDC MOTOR LAB</b>
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem;">
+            Precision electromechanical reference platform and 3-phase BLDC vector simulator.
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <span class="badge badge-info">HTML5 SVG</span>
+            <span class="badge badge-success">ZERO DEPENDENCIES</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>DOCUMENTATION</h5>
+          <ul>
+            <li><a href="index.html">Simulation Console</a></li>
+            <li><a href="theory.html">Lorentz Electromagnetics</a></li>
+            <li><a href="theory.html#commutation">6-Step Truth Matrix</a></li>
+            <li><a href="theory.html#hall-sensors">Digital Hall Logic</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>INSTRUMENTATION</h5>
+          <ul>
+            <li><a href="calculator.html">Kv & Torque Calculator</a></li>
+            <li><a href="calculator.html#torque-curve">Torque-Speed Plot</a></li>
+            <li><a href="comparison.html">BLDC vs Brushed</a></li>
+            <li><a href="diy-lab.html">Arduino & ESC Wiring</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>SPECIFICATIONS</h5>
+          <ul>
+            <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Source Repository</a></li>
+            <li><a href="diy-lab.html#safety">Test Safety Protocols</a></li>
+            <li><a href="diy-lab.html#code">Firmware Buffers</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 BLDC MOTOR LAB. BUILT FOR GITHUB PAGES DEPLOYMENT.</div>
+        <div style="color: var(--accent-amber);">MIT LICENSE // STANDARDS: IEEE 841</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/diy-bench.js"></script>
+  <script>
+    function switchCodeTab(platform) {
+      const arduinoWrap = document.getElementById('code-arduino-wrap');
+      const esp32Wrap = document.getElementById('code-esp32-wrap');
+      const tabArduino = document.getElementById('tab-arduino');
+      const tabEsp32 = document.getElementById('tab-esp32');
+      const copyBtn = document.querySelector('.copy-btn');
+
+      if (platform === 'arduino') {
+        arduinoWrap.style.display = 'block';
+        esp32Wrap.style.display = 'none';
+        tabArduino.classList.add('active');
+        tabEsp32.classList.remove('active');
+        copyBtn.setAttribute('data-target', 'active-code');
+      } else {
+        arduinoWrap.style.display = 'none';
+        esp32Wrap.style.display = 'block';
+        tabArduino.classList.remove('active');
+        tabEsp32.classList.add('active');
+        copyBtn.setAttribute('data-target', 'code-esp32');
+      }
+    }
+  </script>
+</body>
+</html>

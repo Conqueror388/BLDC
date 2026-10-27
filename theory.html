@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electromagnetics & 6-Step Commutation — BLDC Motor Lab</title>
+  <meta name="description" content="Technical physics reference on 3-phase BLDC motor armatures, Lorentz force, 6-step trapezoidal commutation truth table, and Back-EMF zero-crossing detection.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Precision Calibration Ticker Tape -->
+  <div class="instrument-ticker">
+    <div class="ticker-status">
+      <span class="ticker-dot"></span>
+      <span>THEORY & COMMUTATION REFERENCE // DOSSIER 01-B</span>
+    </div>
+    <div class="ticker-right">
+      <span>TOPOLOGY: 3-PHASE WYE / DELTA</span>
+      <span>FLUX ANGLE: 60° – 120° LEAD</span>
+      <span>IEEE 841 STANDARDS</span>
+    </div>
+  </div>
+
+  <!-- Precision Console Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand-link">
+        <div class="brand-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <b>BLDC MOTOR LAB</b>
+          <span>INSTRUMENTATION CONSOLE</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item"><a href="index.html">Sim Console</a></li>
+          <li class="nav-item"><a href="theory.html" class="active">Theory & Commutation</a></li>
+          <li class="nav-item"><a href="calculator.html">Dynamics Solver</a></li>
+          <li class="nav-item"><a href="comparison.html">Tech Comparison</a></li>
+          <li class="nav-item"><a href="diy-lab.html">Hardware Bench</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="mobile-toggle" aria-label="Toggle navigation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+    
+    <!-- Dossier Title Block -->
+    <div style="border-bottom: 1px solid var(--border-line); padding-bottom: 2rem; margin-bottom: 3rem;" class="reveal-on-scroll">
+      <div class="rack-header-badge">
+        <span>PHYSICS REFERENCE // 3-PHASE ARMATURE & FIELD</span>
+      </div>
+      <h1 style="font-size: clamp(2.2rem, 4.5vw, 3.4rem); margin-bottom: 1rem; letter-spacing: -0.04em;">
+        Electromagnetics & Working Principle
+      </h1>
+      <p style="font-size: 1.08rem; color: var(--text-secondary); max-width: 50rem; line-height: 1.7;">
+        A Brushless DC motor operates on Lorentz force interactions: <code class="mono" style="color: var(--accent-amber); font-weight: 600;">F = I · (L × B)</code>. Solid-state MOSFET inverters replace physical carbon commutators, switching current through copper phase pairs to keep the stator magnetic vector orthogonal to the permanent magnet rotor.
+      </p>
+    </div>
+
+    <!-- Stator vs Rotor Machine Architecture -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3.5rem;" class="reveal-on-scroll">
+      
+      <!-- Stator Panel -->
+      <div class="instrument-panel">
+        <div class="panel-header-bar">
+          <span class="label-cap">[01 // STATOR ARMATURE]</span>
+          <span class="badge badge-info">STATIONARY</span>
+        </div>
+        <h3 style="margin-bottom: 0.75rem; color: #ECEFF4;">Silicon Steel Laminations & 3-Phase Windings</h3>
+        <p style="font-size: 0.92rem; line-height: 1.7; margin-bottom: 1rem;">
+          The stator core uses thin, insulated silicon-steel laminations (0.2mm to 0.35mm thickness) to suppress circulating eddy currents and reduce hysteresis loss:
+        </p>
+        <ul style="padding-left: 1.25rem; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8;">
+          <li><b>STAR (WYE) CONFIG:</b> Windings share a central neutral point. Line-to-line voltage is <code class="mono" style="color: var(--accent-amber);">V_LL = √3 · V_phase</code>, phase current equals line current (<code class="mono">I_phase = I_line</code>). Yields higher starting torque (<code class="mono">Kt_wye = √3 · Kt_delta</code>) and an accessible virtual neutral for sensorless zero-crossing detection.</li>
+          <li><b>DELTA (&Delta;) CONFIG:</b> Closed loop with no neutral wire. Line voltage equals phase voltage (<code class="mono">V_line = V_phase</code>) and line current is <code class="mono">I_line = √3 · I_phase</code>. Yields 1.732× higher rotational speed (<code class="mono">Kv_delta = √3 · Kv_wye</code>) for the same terminal voltage, popular in high-speed racing drones.</li>
+          <li>Each phase coil pair (A, B, C) is spaced geometrically 120&deg; apart on the stator iron core.</li>
+        </ul>
+      </div>
+
+      <!-- Rotor Panel -->
+      <div class="instrument-panel">
+        <div class="panel-header-bar">
+          <span class="label-cap">[02 // ROTOR FIELD]</span>
+          <span class="badge badge-info">ROTATING</span>
+        </div>
+        <h3 style="margin-bottom: 0.75rem; color: #ECEFF4;">Permanent Magnets & Pole Topologies</h3>
+        <p style="font-size: 0.92rem; line-height: 1.7; margin-bottom: 1rem;">
+          High-energy Neodymium-Iron-Boron (NdFeB, Grade N48–N52) rare-earth magnets form alternating North and South magnetic poles on the spinning element:
+        </p>
+        <ul style="padding-left: 1.25rem; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8;">
+          <li><b>OUTRUNNER (BELL):</b> Permanent magnets mounted on the outer rotating bell surrounding the inner stationary stator. Provides high torque constant (Kt) for direct-drive propellers and hub motors.</li>
+          <li><b>INRUNNER:</b> Cylindrical rotor rotates inside an outer stator housing. Low rotational inertia permits extreme speeds exceeding 50,000 RPM (RC cars, EDF fans).</li>
+          <li><b>ELECTRICAL FREQUENCY EQUATION:</b> <code class="mono" style="color: var(--accent-amber);">f_elec = (P_poles / 2) × (RPM / 60)</code>. For a 14-pole motor at 12,000 RPM: <code class="mono">f_elec = 7 × 200 = 1,400 Hz</code>.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- NEW INTERACTIVE LEARNING PLATFORM: 6-STEP INVERTER & COMMUTATION LAB -->
+    <div class="instrument-panel reveal-on-scroll" style="margin-bottom: 3.5rem;">
+      <div class="panel-header-bar">
+        <div class="panel-header-title">
+          <span class="panel-indicator-dot"></span>
+          <b style="font-family: var(--font-display); font-size: 1.15rem;">INTERACTIVE 6-STEP COMMUTATION & INVERTER BENCH</b>
+        </div>
+        <span class="badge badge-success">LIVE CIRCUIT SIMULATOR</span>
+      </div>
+
+      <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem;">
+        Click through each step below or press <b>Auto Advance</b> to observe how the 3-phase MOSFET bridge directs current through the windings to advance the stator magnetic vector in 60° increments:
+      </p>
+
+      <!-- Stepper Controls -->
+      <div class="commutation-stepper-rack">
+        <button type="button" class="step-nav-btn active" id="step-btn-1">STEP 01 [A→B]</button>
+        <button type="button" class="step-nav-btn" id="step-btn-2">STEP 02 [A→C]</button>
+        <button type="button" class="step-nav-btn" id="step-btn-3">STEP 03 [B→C]</button>
+        <button type="button" class="step-nav-btn" id="step-btn-4">STEP 04 [B→A]</button>
+        <button type="button" class="step-nav-btn" id="step-btn-5">STEP 05 [C→A]</button>
+        <button type="button" class="step-nav-btn" id="step-btn-6">STEP 06 [C→B]</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-auto-cycle">[ AUTO ADVANCE ]</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-step-prev">&larr; PREV</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-step-next">NEXT &rarr;</button>
+      </div>
+
+      <!-- Live Interactive Inverter State Display -->
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.5rem; align-items: start; margin-bottom: 1.5rem;">
+        
+        <!-- Left: 6-MOSFET Inverter Bridge Representation -->
+        <div class="inverter-bridge-canvas">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-line); padding-bottom: 0.5rem;">
+            <span class="label-cap">3-PHASE INVERTER BRIDGE (6 MOSFETS)</span>
+            <span class="mono" style="font-size: 0.75rem; color: var(--accent-amber);" id="t-active-mosfets">Q1 (A High) + Q4 (B Low)</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+            <!-- Phase A Half-Bridge -->
+            <div style="background: var(--bg-chassis); padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-line);">
+              <div class="mono" style="font-size: 0.75rem; font-weight: 700; color: var(--phase-a); margin-bottom: 0.5rem;">PHASE A</div>
+              <div id="mosfet-q1" data-name="Q1 (HIGH)" class="mosfet-chip on" style="margin-bottom: 0.5rem;">Q1 [ON]</div>
+              <div style="height: 12px; width: 2px; background: var(--border-strong); margin: 0 auto 0.5rem;"></div>
+              <div id="mosfet-q2" data-name="Q2 (LOW)" class="mosfet-chip off">Q2 [OFF]</div>
+            </div>
+
+            <!-- Phase B Half-Bridge -->
+            <div style="background: var(--bg-chassis); padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-line);">
+              <div class="mono" style="font-size: 0.75rem; font-weight: 700; color: var(--phase-b); margin-bottom: 0.5rem;">PHASE B</div>
+              <div id="mosfet-q3" data-name="Q3 (HIGH)" class="mosfet-chip off" style="margin-bottom: 0.5rem;">Q3 [OFF]</div>
+              <div style="height: 12px; width: 2px; background: var(--border-strong); margin: 0 auto 0.5rem;"></div>
+              <div id="mosfet-q4" data-name="Q4 (LOW)" class="mosfet-chip on">Q4 [ON]</div>
+            </div>
+
+            <!-- Phase C Half-Bridge -->
+            <div style="background: var(--bg-chassis); padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-line);">
+              <div class="mono" style="font-size: 0.75rem; font-weight: 700; color: var(--phase-c); margin-bottom: 0.5rem;">PHASE C</div>
+              <div id="mosfet-q5" data-name="Q5 (HIGH)" class="mosfet-chip off" style="margin-bottom: 0.5rem;">Q5 [OFF]</div>
+              <div style="height: 12px; width: 2px; background: var(--border-strong); margin: 0 auto 0.5rem;"></div>
+              <div id="mosfet-q6" data-name="Q6 (LOW)" class="mosfet-chip off">Q6 [OFF]</div>
+            </div>
+          </div>
+
+          <!-- Phase Pills Status -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1rem;">
+            <div id="t-pill-a" class="phase-pill a-high">PHASE A: <b>HIGH (+V)</b></div>
+            <div id="t-pill-b" class="phase-pill b-low">PHASE B: <b>LOW (GND)</b></div>
+            <div id="t-pill-c" class="phase-pill floating">PHASE C: <i>FLOAT (Z)</i></div>
+          </div>
+        </div>
+
+        <!-- Right: Real-Time Telemetry & Vector Compass -->
+        <div style="background: var(--bg-recessed); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem;">
+          <div class="spec-ledger-title" style="margin-bottom: 0.75rem;">
+            <span class="label-cap">COMMUTATION VECTOR TELEMETRY</span>
+            <span class="badge badge-info" id="t-active-step">STEP 01 / 06</span>
+          </div>
+
+          <div style="display: grid; gap: 0.65rem; font-size: 0.85rem; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">ELECTRICAL SECTOR:</span>
+              <span class="mono" id="t-elec-angle" style="color: var(--text-primary); font-weight: 700;">000° – 060°</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">HALL SENSOR CODE:</span>
+              <span class="mono" id="t-hall-code" style="color: var(--accent-emerald); font-weight: 700;">1 0 1</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">CURRENT LOOP:</span>
+              <span class="mono" id="t-active-loop" style="color: var(--accent-amber); font-weight: 700;">A → B</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">STATOR FLUX VECTOR:</span>
+              <span class="mono" id="t-vector-angle" style="color: var(--text-primary); font-weight: 700;">60°</span>
+            </div>
+          </div>
+
+          <!-- Vector Compass Dial -->
+          <div style="text-align: center; margin-bottom: 0.75rem;">
+            <svg width="100" height="100" viewBox="0 0 200 200" style="display: inline-block;">
+              <circle cx="100" cy="100" r="85" fill="#0A0D12" stroke="#1D2330" stroke-width="2"/>
+              <circle cx="100" cy="100" r="4" fill="#FF7700"/>
+              <text x="100" y="24" fill="#8B95A5" font-size="10" font-family="var(--font-mono)" text-anchor="middle">0°/360°</text>
+              <text x="180" y="104" fill="#8B95A5" font-size="10" font-family="var(--font-mono)" text-anchor="middle">90°</text>
+              <text x="100" y="184" fill="#8B95A5" font-size="10" font-family="var(--font-mono)" text-anchor="middle">180°</text>
+              <text x="20" y="104" fill="#8B95A5" font-size="10" font-family="var(--font-mono)" text-anchor="middle">270°</text>
+              
+              <!-- Rotating Vector Needle -->
+              <g id="vector-needle" transform="rotate(60 100 100)">
+                <line x1="100" y1="100" x2="100" y2="35" stroke="#FF7700" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="100,24 94,36 106,36" fill="#FF7700"/>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Dynamic Deep-Dive Explanation -->
+          <div id="t-step-desc" style="font-size: 0.82rem; line-height: 1.6; color: var(--text-secondary); background: rgba(255, 119, 0, 0.05); border: 1px solid rgba(255, 119, 0, 0.2); padding: 0.75rem; border-radius: var(--radius-md);">
+            Q1 connects Phase A to V_BUS; Q4 connects Phase B to GND. Current flows from A through the central neutral star point and sinks into B. Phase C is disconnected. Stator flux points at 60°, exerting peak CW torque on the rotor.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 6-Step Commutation Truth Table -->
+    <section id="commutation" style="margin-bottom: 4rem;" class="reveal-on-scroll">
+      <div style="border-bottom: 1px solid var(--border-line); padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <span class="label-cap">SWITCHING SEQUENCE DOSSIER</span>
+          <h2 style="font-size: 1.8rem; margin-top: 0.25rem;">Six-Step 120° Trapezoidal Commutation Matrix</h2>
+        </div>
+        <span class="mono" style="font-size: 0.78rem; color: var(--accent-amber);">60° ELECTRICAL SECTORS</span>
+      </div>
+
+      <p style="max-width: 48rem; margin-bottom: 1.5rem; font-size: 0.95rem;">
+        During each 60&deg; electrical sector, exactly <b>two phase windings conduct current</b> (one tied to V_bus high, one tied to GND low) while the <b>third phase remains floating (High-Z)</b>. The magnetic vector generated by the stator maintains an angular displacement of 60&deg; to 120&deg; ahead of the rotor flux, exerting continuous forward torque.
+      </p>
+
+      <div class="table-responsive">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>SECTOR</th>
+              <th>ELECTRICAL ANGLE</th>
+              <th>HALL CODE [H1 H2 H3]</th>
+              <th>PHASE A</th>
+              <th>PHASE B</th>
+              <th>PHASE C</th>
+              <th>CURRENT LOOP</th>
+              <th>STATOR VECTOR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b class="mono" style="color: var(--accent-amber);">STEP 01</b></td>
+              <td class="mono">000° – 060°</td>
+              <td class="mono" style="color: var(--accent-emerald); font-weight: 700;">1 0 1</td>
+              <td><span class="badge" style="background: var(--phase-a-bg); color: var(--phase-a); border: 1px solid var(--phase-a);">HIGH (+V)</span></td>
+              <td><span class="badge" style="background: var(--phase-b-bg); color: var(--phase-b); border: 1px solid var(--phase-b);">LOW (GND)</span></td>
+              <td><span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">FLOAT (Z)</span></td>
+              <td class="mono" style="font-weight: 700; color: #ECEFF4;">A &rarr; B</td>
+              <td class="mono">060°</td>
+            </tr>
+            <tr>
+              <td><b class="mono" style="color: var(--accent-amber);">STEP 02</b></td>
+              <td class="mono">060° – 120°</td>
+              <td class="mono" style="color: var(--accent-emerald); font-weight: 700;">1 0 0</td>
+              <td><span class="badge" style="background: var(--phase-a-bg); color: var(--phase-a); border: 1px solid var(--phase-a);">HIGH (+V)</span></td>
+              <td><span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">FLOAT (Z)</span></td>
+              <td><span class="badge" style="background: var(--phase-c-bg); color: var(--phase-c); border: 1px solid var(--phase-c);">LOW (GND)</span></td>
+              <td class="mono" style="font-weight: 700; color: #ECEFF4;">A &rarr; C</td>
+              <td class="mono">120°</td>
+            </tr>
+            <tr>
+              <td><b class="mono" style="color: var(--accent-amber);">STEP 03</b></td>
+              <td class="mono">120° – 180°</td>
+              <td class="mono" style="color: var(--accent-emerald); font-weight: 700;">1 1 0</td>
+              <td><span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">FLOAT (Z)</span></td>
+              <td><span class="badge" style="background: var(--phase-b-bg); color: var(--phase-b); border: 1px solid var(--phase-b);">HIGH (+V)</span></td>
+              <td><span class="badge" style="background: var(--phase-c-bg); color: var(--phase-c); border: 1px solid var(--phase-c);">LOW (GND)</span></td>
+              <td class="mono" style="font-weight: 700; color: #ECEFF4;">B &rarr; C</td>
+              <td class="mono">180°</td>
+            </tr>
+            <tr>
+              <td><b class="mono" style="color: var(--accent-amber);">STEP 04</b></td>
+              <td class="mono">180° – 240°</td>
+              <td class="mono" style="color: var(--accent-emerald); font-weight: 700;">0 1 0</td>
+              <td><span class="badge" style="background: var(--phase-a-bg); color: var(--phase-a); border: 1px solid var(--phase-a);">LOW (GND)</span></td>
+              <td><span class="badge" style="background: var(--phase-b-bg); color: var(--phase-b); border: 1px solid var(--phase-b);">HIGH (+V)</span></td>
+              <td><span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">FLOAT (Z)</span></td>
+              <td class="mono" style="font-weight: 700; color: #ECEFF4;">B &rarr; A</td>
+              <td class="mono">240°</td>
+            </tr>
+            <tr>
+              <td><b class="mono" style="color: var(--accent-amber);">STEP 05</b></td>
+              <td class="mono">240° – 300°</td>
+              <td class="mono" style="color: var(--accent-emerald); font-weight: 700;">0 1 1</td>
+              <td><span class="badge" style="background: var(--phase-a-bg); color: var(--phase-a); border: 1px solid var(--phase-a);">LOW (GND)</span></td>
+              <td><span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">FLOAT (Z)</span></td>
+              <td><span class="badge" style="background: var(--phase-c-bg); color: var(--phase-c); border: 1px solid var(--phase-c);">HIGH (+V)</span></td>
+              <td class="mono" style="font-weight: 700; color: #ECEFF4;">C &rarr; A</td>
+              <td class="mono">300°</td>
+            </tr>
+            <tr>
+              <td><b class="mono" style="color: var(--accent-amber);">STEP 06</b></td>
+              <td class="mono">300° – 360°</td>
+              <td class="mono" style="color: var(--accent-emerald); font-weight: 700;">0 0 1</td>
+              <td><span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">FLOAT (Z)</span></td>
+              <td><span class="badge" style="background: var(--phase-b-bg); color: var(--phase-b); border: 1px solid var(--phase-b);">LOW (GND)</span></td>
+              <td><span class="badge" style="background: var(--phase-c-bg); color: var(--phase-c); border: 1px solid var(--phase-c);">HIGH (+V)</span></td>
+              <td class="mono" style="font-weight: 700; color: #ECEFF4;">C &rarr; B</td>
+              <td class="mono">360° (000°)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Sensored vs Sensorless Detection -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3.5rem;" class="reveal-on-scroll">
+      
+      <div class="instrument-panel" id="hall-sensors">
+        <div class="panel-header-bar">
+          <span class="label-cap">[03 // HALL SENSORS]</span>
+          <span class="badge badge-success">0 RPM START</span>
+        </div>
+        <h3 style="margin-bottom: 0.75rem; color: #ECEFF4;">Digital Hall Position Decoding</h3>
+        <p style="font-size: 0.92rem; line-height: 1.7; margin-bottom: 1rem;">
+          Three bipolar latching Hall effect ICs are installed 120&deg; apart on the stator periphery. As rotor poles pass:
+        </p>
+        <ul style="padding-left: 1.25rem; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8;">
+          <li><b>NORTH POLE FLUX:</b> Pulls sensor output logic <b>1</b>.</li>
+          <li><b>SOUTH POLE FLUX:</b> Resets sensor output logic <b>0</b>.</li>
+          <li>Forms six 3-bit binary words (<code>101</code>, <code>100</code>, <code>110</code>, <code>010</code>, <code>011</code>, <code>001</code>). The invalid states <code>000</code> and <code>111</code> immediately trigger hardware fault protection.</li>
+          <li>Delivers full starting torque from 0 RPM (electric scooters, robotic servos, gimbals).</li>
+        </ul>
+      </div>
+
+      <div class="instrument-panel">
+        <div class="panel-header-bar">
+          <span class="label-cap">[04 // BACK-EMF]</span>
+          <span class="badge badge-info">HIGH RELIABILITY</span>
+        </div>
+        <h3 style="margin-bottom: 0.75rem; color: #ECEFF4;">Sensorless Zero-Crossing Detection</h3>
+        <p style="font-size: 0.92rem; line-height: 1.7; margin-bottom: 1rem;">
+          Eliminates sensor wires in severe environments. The ESC measures the induced Back-EMF on the unpowered floating phase winding:
+        </p>
+        <ul style="padding-left: 1.25rem; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8;">
+          <li>Induced voltage follows generator principle: <code class="mono" style="color: var(--accent-amber);">V_bemf = Ke · ω</code>.</li>
+          <li>When this voltage passes through the virtual center tap (<code class="mono">V_bus / 2</code>), a comparator registers a <b>Zero-Crossing Event</b>.</li>
+          <li>Microcontroller timer delays 30&deg; electrical degrees, then executes commutation.</li>
+          <li>At 0 RPM, <code class="mono">V_bemf = 0</code>, requiring an open-loop stepper-style ramp-up sequence.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Navigation Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-line); padding-top: 1.5rem;" class="reveal-on-scroll">
+      <a href="index.html" class="btn btn-secondary">
+        &larr; Return to Simulation Console
+      </a>
+      <a href="calculator.html" class="btn btn-primary">
+        Launch Dynamics Solver &rarr;
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Live Coordinate HUD Stamp -->
+  <div class="hud-coords-stamp">
+    <span>SYS_LOC [X:0000 Y:0000]</span>
+    <span style="color: #ECEFF4;">THEORY_ACTIVE</span>
+  </div>
+  <div class="hud-crosshair"></div>
+
+  <!-- Industrial Console Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
+            <div class="brand-badge" style="width: 24px; height: 24px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </div>
+            <b style="font-family: var(--font-display); font-size: 1.05rem; color: var(--text-primary);">BLDC MOTOR LAB</b>
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem;">
+            Precision electromechanical reference platform and 3-phase BLDC vector simulator.
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <span class="badge badge-info">HTML5 SVG</span>
+            <span class="badge badge-success">ZERO DEPENDENCIES</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>DOCUMENTATION</h5>
+          <ul>
+            <li><a href="index.html">Simulation Console</a></li>
+            <li><a href="theory.html">Lorentz Electromagnetics</a></li>
+            <li><a href="theory.html#commutation">6-Step Truth Matrix</a></li>
+            <li><a href="theory.html#hall-sensors">Digital Hall Logic</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>INSTRUMENTATION</h5>
+          <ul>
+            <li><a href="calculator.html">Kv & Torque Calculator</a></li>
+            <li><a href="calculator.html#torque-curve">Torque-Speed Plot</a></li>
+            <li><a href="comparison.html">BLDC vs Brushed</a></li>
+            <li><a href="diy-lab.html">Arduino & ESC Wiring</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>SPECIFICATIONS</h5>
+          <ul>
+            <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Source Repository</a></li>
+            <li><a href="diy-lab.html#safety">Test Safety Protocols</a></li>
+            <li><a href="diy-lab.html#code">Firmware Buffers</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 BLDC MOTOR LAB. BUILT FOR GITHUB PAGES DEPLOYMENT.</div>
+        <div style="color: var(--accent-amber);">MIT LICENSE // STANDARDS: IEEE 841</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/theory-lab.js"></script>
+</body>
+</html>

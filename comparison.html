@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motor Architecture Benchmark Matrix — BLDC Motor Lab</title>
+  <meta name="description" content="Technical comparison matrix of BLDC, Brushed DC, Stepper, and PMSM electric motors. Interactive motor selection advisor for engineering projects.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Precision Calibration Ticker Tape -->
+  <div class="instrument-ticker">
+    <div class="ticker-status">
+      <span class="ticker-dot"></span>
+      <span>BENCHMARK MATRIX & TOPOLOGY ADVISOR // DOSSIER 03-D</span>
+    </div>
+    <div class="ticker-right">
+      <span>EVALUATION CRITERIA: EFFICIENCY, LIFESPAN, EMI, RPM</span>
+      <span>STANDARDS: NEMA / IEC</span>
+    </div>
+  </div>
+
+  <!-- Precision Console Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand-link">
+        <div class="brand-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <b>BLDC MOTOR LAB</b>
+          <span>INSTRUMENTATION CONSOLE</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item"><a href="index.html">Sim Console</a></li>
+          <li class="nav-item"><a href="theory.html">Theory & Commutation</a></li>
+          <li class="nav-item"><a href="calculator.html">Dynamics Solver</a></li>
+          <li class="nav-item"><a href="comparison.html" class="active">Tech Comparison</a></li>
+          <li class="nav-item"><a href="diy-lab.html">Hardware Bench</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="mobile-toggle" aria-label="Toggle navigation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+    
+    <!-- Title Block -->
+    <div style="border-bottom: 1px solid var(--border-line); padding-bottom: 2rem; margin-bottom: 3rem;" class="reveal-on-scroll">
+      <div class="rack-header-badge">
+        <span>TOPOLOGY BENCHMARK & SELECTION DOSSIER</span>
+      </div>
+      <h1 style="font-size: clamp(2.2rem, 4.5vw, 3.4rem); margin-bottom: 1rem; letter-spacing: -0.04em;">
+        Motor Architecture Comparison
+      </h1>
+      <p style="font-size: 1.08rem; color: var(--text-secondary); max-width: 50rem; line-height: 1.7;">
+        Evaluate physical tradeoffs between Brushless DC, Brushed DC, Stepper motors, and Permanent Magnet Synchronous Motors (PMSM) across efficiency, mechanical maintenance, acoustic emission, and electronic driver complexity.
+      </p>
+    </div>
+
+    <!-- Master Benchmark Matrix -->
+    <div class="table-responsive reveal-on-scroll" style="margin-bottom: 3.5rem;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>METRIC / ATTRIBUTE</th>
+            <th>BLDC MOTOR</th>
+            <th>BRUSHED DC</th>
+            <th>STEPPER MOTOR</th>
+            <th>PMSM (AC SYNC)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b class="mono">COMMUTATION METHOD</b></td>
+            <td><span class="badge badge-info">SOLID-STATE ESC</span></td>
+            <td>Mechanical Carbon Brushes</td>
+            <td>H-Bridge Microstepping</td>
+            <td>Sinusoidal Inverter (FOC)</td>
+          </tr>
+          <tr>
+            <td><b class="mono">TYPICAL EFFICIENCY</b></td>
+            <td><span class="badge badge-success">85% – 93%</span></td>
+            <td>65% – 75%</td>
+            <td>55% – 70%</td>
+            <td><span class="badge badge-success">92% – 97%</span></td>
+          </tr>
+          <tr>
+            <td><b class="mono">OPERATIONAL LIFESPAN</b></td>
+            <td><span class="badge badge-success">&gt;15,000 HRS (BEARINGS)</span></td>
+            <td>1,000 – 3,000 hrs (Brushes)</td>
+            <td>&gt;10,000 hrs</td>
+            <td><span class="badge badge-success">&gt;25,000 HRS</span></td>
+          </tr>
+          <tr>
+            <td><b class="mono">MAXIMUM VELOCITY</b></td>
+            <td>Up to 60,000+ RPM</td>
+            <td>Limited by brush arcing</td>
+            <td>Low (&lt;3,000 RPM)</td>
+            <td>Up to 20,000+ RPM</td>
+          </tr>
+          <tr>
+            <td><b class="mono">DETENT / HOLD TORQUE</b></td>
+            <td>Requires active encoder</td>
+            <td>Low / none without gearbox</td>
+            <td><span class="badge badge-success">MAXIMUM (DETENT)</span></td>
+            <td>High with FOC vector</td>
+          </tr>
+          <tr>
+            <td><b class="mono">EMI / NOISE EMISSION</b></td>
+            <td>Low (Silent on FOC)</td>
+            <td>High (Sparking contact arc)</td>
+            <td>Resonant acoustic hum</td>
+            <td>Extremely Quiet</td>
+          </tr>
+          <tr>
+            <td><b class="mono">DRIVER ELECTRONICS</b></td>
+            <td>3-Phase Inverter Bridge</td>
+            <td><span class="badge badge-success">ZERO (DIRECT DC)</span></td>
+            <td>Dual H-Bridge Driver</td>
+            <td>DSP Space Vector Inverter</td>
+          </tr>
+          <tr>
+            <td><b class="mono">IDEAL APPLICATION</b></td>
+            <td>Drones, E-Bikes, RC, Fans</td>
+            <td>Power tools, cheap toys</td>
+            <td>3D printers, CNC linear axis</td>
+            <td>Electric Vehicles, Traction</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NEW INTERACTIVE LEARNING PLATFORM: VIRTUAL 1,000-HOUR STRESS TEST -->
+    <div class="instrument-panel reveal-on-scroll" style="margin-bottom: 3.5rem;">
+      <div class="panel-header-bar">
+        <div class="panel-header-title">
+          <span class="panel-indicator-dot"></span>
+          <b style="font-family: var(--font-display); font-size: 1.15rem;">VIRTUAL 1,000-HOUR ENDURANCE & WEAR SIMULATOR</b>
+        </div>
+        <span class="badge badge-success">ACCELERATED WEAR BENCH</span>
+      </div>
+
+      <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem;">
+        Observe how mechanical carbon brushes degrade under continuous high-speed rotation compared to brushless electronic commutation and stepper thermal heating:
+      </p>
+
+      <!-- Simulation Action Bar -->
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <button type="button" class="btn btn-primary btn-sm" id="btn-run-stress">[ RUN 1,000-HR TEST ]</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-stress">[ RESET ]</button>
+        <span class="mono" id="stress-hr-counter" style="font-size: 0.9rem; font-weight: 700; color: var(--accent-amber); padding: 0.35rem 0.85rem; background: var(--bg-recessed); border-radius: var(--radius-pill); border: 1px solid var(--border-line);">
+          T+ 0000 HOURS
+        </span>
+      </div>
+
+      <!-- 3-Channel Stress Gauge Cards -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 1.5rem;">
+        
+        <!-- Brushed DC Card -->
+        <div style="background: var(--bg-recessed); border: 1px solid var(--border-line); border-radius: var(--radius-lg); padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <b class="mono" style="font-size: 0.82rem; color: #ECEFF4;">BRUSHED DC</b>
+            <span class="badge badge-success" id="status-brushed" style="font-size: 0.65rem;">OPERATIONAL</span>
+          </div>
+
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; display: flex; justify-content: space-between;">
+            <span>CARBON BRUSH LIFE:</span>
+            <span class="mono" id="val-brushed-life" style="color: var(--accent-amber); font-weight: 700;">100%</span>
+          </div>
+          <div style="height: 8px; background: #0A0D12; border-radius: var(--radius-pill); overflow: hidden; border: 1px solid var(--border-line); margin-bottom: 0.75rem;">
+            <div id="bar-brushed-life" style="width: 100%; height: 100%; background: var(--accent-amber); border-radius: var(--radius-pill); transition: width 0.1s;"></div>
+          </div>
+
+          <div class="mono" id="spark-indicator" style="font-size: 0.72rem; color: var(--text-muted);">NOMINAL ARCS</div>
+        </div>
+
+        <!-- Stepper Motor Card -->
+        <div style="background: var(--bg-recessed); border: 1px solid var(--border-line); border-radius: var(--radius-lg); padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <b class="mono" style="font-size: 0.82rem; color: #ECEFF4;">STEPPER MOTOR</b>
+            <span class="badge badge-success" id="status-stepper" style="font-size: 0.65rem;">STABLE HOLDING</span>
+          </div>
+
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; display: flex; justify-content: space-between;">
+            <span>COIL TEMPERATURE:</span>
+            <span class="mono" id="val-stepper-temp" style="color: #FF8800; font-weight: 700;">25°C</span>
+          </div>
+          <div style="height: 8px; background: #0A0D12; border-radius: var(--radius-pill); overflow: hidden; border: 1px solid var(--border-line); margin-bottom: 0.75rem;">
+            <div id="bar-stepper-temp" style="width: 25%; height: 100%; background: #FF8800; border-radius: var(--radius-pill); transition: width 0.1s;"></div>
+          </div>
+
+          <div class="mono" style="font-size: 0.72rem; color: var(--text-muted);">CONTINUOUS HOLDING CURRENT</div>
+        </div>
+
+        <!-- BLDC Motor Card -->
+        <div style="background: var(--bg-recessed); border: 1px solid var(--border-line); border-radius: var(--radius-lg); padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <b class="mono" style="font-size: 0.82rem; color: #ECEFF4;">BLDC MOTOR</b>
+            <span class="badge badge-success" id="status-bldc" style="font-size: 0.65rem;">NOMINAL (>14,000 HRS)</span>
+          </div>
+
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; display: flex; justify-content: space-between;">
+            <span>BEARING INTEGRITY:</span>
+            <span class="mono" id="val-bldc-life" style="color: #00D2A0; font-weight: 700;">100%</span>
+          </div>
+          <div style="height: 8px; background: #0A0D12; border-radius: var(--radius-pill); overflow: hidden; border: 1px solid var(--border-line); margin-bottom: 0.75rem;">
+            <div id="bar-bldc-life" style="width: 100%; height: 100%; background: #00D2A0; border-radius: var(--radius-pill); transition: width 0.1s;"></div>
+          </div>
+
+          <div class="mono" style="font-size: 0.72rem; color: #00D2A0;">ZERO CONTACT WEAR (SOLID-STATE)</div>
+        </div>
+
+      </div>
+
+      <!-- Head-to-Head Spec Radar & Multi-Axis Comparator -->
+      <div style="background: var(--bg-chassis); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+          <span class="label-cap">HEAD-TO-HEAD SPECIFICATION BENCHMARK</span>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <select id="spec-motor-a" class="calc-input" style="padding: 0.35rem 0.75rem; font-size: 0.78rem; width: auto; border-radius: var(--radius-pill);">
+              <option value="bldc" selected>BLDC Motor</option>
+              <option value="brushed">Brushed DC</option>
+              <option value="stepper">Stepper Motor</option>
+              <option value="pmsm">PMSM AC Sync</option>
+            </select>
+            <span class="mono" style="color: var(--text-muted); font-size: 0.75rem;">VS</span>
+            <select id="spec-motor-b" class="calc-input" style="padding: 0.35rem 0.75rem; font-size: 0.78rem; width: auto; border-radius: var(--radius-pill);">
+              <option value="brushed" selected>Brushed DC</option>
+              <option value="bldc">BLDC Motor</option>
+              <option value="stepper">Stepper Motor</option>
+              <option value="pmsm">PMSM AC Sync</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="spec-comparison-bars">
+          <!-- Injected via comparison-bench.js -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Interactive Motor Sizing Advisor -->
+    <div class="instrument-panel reveal-on-scroll" style="margin-bottom: 3.5rem;">
+      <div class="panel-header-bar">
+        <span class="label-cap">[INTERACTIVE TOPOLOGY SELECTOR]</span>
+        <span class="badge badge-info">DECISION ENGINE</span>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <span class="label-cap" style="display: block; margin-bottom: 0.6rem;">SELECT TARGET PROJECT CONSTRAINTS:</span>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="advisor-buttons">
+          <button type="button" class="preset-chip active" data-rec="drone">FPV RACING DRONE</button>
+          <button type="button" class="preset-chip" data-rec="printer">3D PRINTER / CNC AXIS</button>
+          <button type="button" class="preset-chip" data-rec="ev">E-SCOOTER / LIGHT EV</button>
+          <button type="button" class="preset-chip" data-rec="toy">LOW-COST TOY ACTUATOR</button>
+          <button type="button" class="preset-chip" data-rec="gimbal">CAMERA GIMBAL DIRECT DRIVE</button>
+        </div>
+      </div>
+
+      <div id="advisor-result" style="background: var(--bg-recessed); border: 1px solid var(--border-strong); padding: 1.5rem; border-radius: var(--radius-lg);">
+        <!-- Injected via script -->
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-line); padding-top: 1.5rem;" class="reveal-on-scroll">
+      <a href="calculator.html" class="btn btn-secondary">
+        &larr; Dynamics Solver
+      </a>
+      <a href="diy-lab.html" class="btn btn-primary">
+        Assemble Hardware Bench &rarr;
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Live Coordinate HUD Stamp -->
+  <div class="hud-coords-stamp">
+    <span>SYS_LOC [X:0000 Y:0000]</span>
+    <span style="color: #ECEFF4;">COMP_ACTIVE</span>
+  </div>
+  <div class="hud-crosshair"></div>
+
+  <!-- Industrial Console Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
+            <div class="brand-badge" style="width: 24px; height: 24px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </div>
+            <b style="font-family: var(--font-display); font-size: 1.05rem; color: var(--text-primary);">BLDC MOTOR LAB</b>
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem;">
+            Precision electromechanical reference platform and 3-phase BLDC vector simulator.
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <span class="badge badge-info">HTML5 SVG</span>
+            <span class="badge badge-success">ZERO DEPENDENCIES</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>DOCUMENTATION</h5>
+          <ul>
+            <li><a href="index.html">Simulation Console</a></li>
+            <li><a href="theory.html">Lorentz Electromagnetics</a></li>
+            <li><a href="theory.html#commutation">6-Step Truth Matrix</a></li>
+            <li><a href="theory.html#hall-sensors">Digital Hall Logic</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>INSTRUMENTATION</h5>
+          <ul>
+            <li><a href="calculator.html">Kv & Torque Calculator</a></li>
+            <li><a href="calculator.html#torque-curve">Torque-Speed Plot</a></li>
+            <li><a href="comparison.html">BLDC vs Brushed</a></li>
+            <li><a href="diy-lab.html">Arduino & ESC Wiring</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>SPECIFICATIONS</h5>
+          <ul>
+            <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Source Repository</a></li>
+            <li><a href="diy-lab.html#safety">Test Safety Protocols</a></li>
+            <li><a href="diy-lab.html#code">Firmware Buffers</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 BLDC MOTOR LAB. BUILT FOR GITHUB PAGES DEPLOYMENT.</div>
+        <div style="color: var(--accent-amber);">MIT LICENSE // STANDARDS: IEEE 841</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/comparison-bench.js"></script>
+  <script>
+    const recData = {
+      drone: {
+        title: "RECOMMENDATION: SENSORLESS BLDC OUTRUNNER",
+        tag: "MAXIMUM THRUST-TO-WEIGHT",
+        desc: "Drones require immense thrust with minimum grams of mass. A high-Kv outrunner BLDC (e.g. 2207 / 2306) coupled with high-frequency 32-bit ESC (DShot protocol) generates >1,500g of propeller thrust per motor with instantaneous response.",
+        why: [
+          "Zero carbon brushes to disintegrate at 35,000 RPM",
+          "Propeller downwash directly cools the rotating outer bell",
+          "Sensorless Back-EMF detection performs flawlessly once aerodynamic airflow begins"
+        ]
+      },
+      printer: {
+        title: "RECOMMENDATION: BIPOLAR HYBRID STEPPER (NEMA 17)",
+        tag: "OPEN-LOOP MICROMETER POSITIONING",
+        desc: "3D printers and laser cutters demand precise open-loop Cartesian coordinates without optical encoders. Standard 1.8° stepping (200 steps/rev) coupled with 1/16 or 1/32 microstepping drivers delivers sub-0.05mm dimensional precision.",
+        why: [
+          "Full holding torque at 0 RPM prevents gantry drift",
+          "Low-cost step and direction interface directly driven by microcontrollers",
+          "Standardized mounting flanges and mechanical pulleys"
+        ]
+      },
+      ev: {
+        title: "RECOMMENDATION: SENSORED BLDC HUB MOTOR OR PMSM",
+        tag: "HIGH BREAKAWAY TORQUE & REGEN",
+        desc: "Light electric mobility requires smooth, high-torque acceleration from a dead stop under full rider load. Digital Hall sensors feed instant rotor angle telemetry to the inverter so the motor never stutters or jags at 0 km/h.",
+        why: [
+          "Hall sensors eliminate rotor cogging at standstill launch",
+          "Regenerative electronic braking recovers kinetic energy into the battery pack",
+          "High efficiency (up to 92%) maximizes battery range per watt-hour"
+        ]
+      },
+      toy: {
+        title: "RECOMMENDATION: MINIATURE BRUSHED DC MOTOR (130 SIZE)",
+        tag: "LOWEST BOM COST & DIRECT DC",
+        desc: "For simple battery-powered toys, cheap electric toothbrushes, or basic actuators, brushed motors cost pennies and connect directly to two AA batteries with no microcontroller or ESC required.",
+        why: [
+          "Zero firmware or driving ICs: simple on/off mechanical toggle",
+          "Inexpensive dual H-bridge (L9110S) provides full forward and reverse",
+          "Economical choice when design operating lifespan is under 300 hours"
+        ]
+      },
+      gimbal: {
+        title: "RECOMMENDATION: HIGH-POLE SENSORED BLDC WITH FOC",
+        tag: "WHISPER-QUIET DIRECT DRIVE",
+        desc: "Camera gimbals demand smooth sub-milliradian positioning without mechanical gear backlash or cogging vibration. High pole-count outrunners (24N28P) driven by SimpleFOC algorithms keep camera footage rock steady.",
+        why: [
+          "Direct drive eliminates mechanical gear lash and slop",
+          "Field Oriented Control produces pure sinusoidal flux with zero torque ripple",
+          "High pole count provides exceptional electrical positioning stiffness"
+        ]
+      }
+    };
+
+    const advisorButtons = document.querySelectorAll('#advisor-buttons .preset-chip');
+    const advisorResult = document.getElementById('advisor-result');
+
+    function renderAdvisor(key) {
+      const item = recData[key];
+      if (!item || !advisorResult) return;
+      advisorResult.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <h3 style="color: #ECEFF4; font-size: 1.15rem;">${item.title}</h3>
+          <span class="badge badge-success">${item.tag}</span>
+        </div>
+        <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 1rem;">${item.desc}</p>
+        <span class="label-cap" style="color: var(--accent-amber);">ENGINEERING RATIONALE:</span>
+        <ul style="padding-left: 1.25rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.4rem; line-height: 1.7;">
+          ${item.why.map(w => `<li>${w}</li>`).join('')}
+        </ul>
+      `;
+    }
+
+    advisorButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        advisorButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderAdvisor(btn.getAttribute('data-rec'));
+      });
+    });
+
+    renderAdvisor('drone');
+  </script>
+</body>
+</html>
