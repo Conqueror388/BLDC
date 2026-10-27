@@ -104,7 +104,7 @@
     </div>
 
     <!-- Calculator Main Layout -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;" class="reveal-on-scroll">
+    <div class="grid-2col reveal-on-scroll" style="margin-bottom: 2.5rem;">
       
       <!-- Left Input Panel -->
       <div class="instrument-panel">
@@ -113,7 +113,7 @@
           <span class="badge badge-info">VARIABLES</span>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="calc-input-pair">
           <div class="calc-input-group">
             <label class="calc-input-label" for="in-v">
               SUPPLY VOLTAGE
@@ -249,7 +249,7 @@
       </div>
 
       <!-- Controls & Equilibrium Result Grid -->
-      <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start;">
+      <div class="bench-layout-grid">
         
         <!-- Controls Column -->
         <div style="background: var(--bg-recessed); border: 1px solid var(--border-line); border-radius: var(--radius-lg); padding: 1.25rem;">

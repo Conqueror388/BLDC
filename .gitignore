@@ -20,4 +20,6 @@ shot*.png
 screenshot*.png
 take-shot.js
 test-explode.js
+test-mobile-audit.js
+mobile-*.png
 .chrome-temp/
